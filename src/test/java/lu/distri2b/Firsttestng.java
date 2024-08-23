@@ -200,9 +200,13 @@ public class Firsttestng {
 
                 // Vérifier si la ligne contient des cellules
                 if (cellules.size() >= 2) {
+                    //WebElement colonneUsername = ligne.findElement(By.xpath(".//td[2]")); //renvoie le deuxieme curent td
+                    //String username1= colonneUsername.getText();
+                    //System.out.println("colone username : "+ username1);
+
                     // Extraire le texte de la deuxième cellule (colonne username)
                     String user1 = cellules.get(1).getText(); // Les indices commencent à 0, donc 1 correspond à la deuxième cellule
-                    System.out.println(user1);
+                    //System.out.println(user1);
                     // Vérifiez si le username correspond à celui recherché
                     if (user1.equals(usernameRechercher)) {
                         System.out.println("Username '" + usernameRechercher + "' trouvé !");
@@ -242,6 +246,6 @@ public class Firsttestng {
     }
     @AfterTest
     public void terminateBrowser() {
-        //driver.quit();  // Fermer le navigateur à la fin du test
+        driver.quit();// Fermer le navigateur à la fin du test
     }
 }
