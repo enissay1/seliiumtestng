@@ -4,25 +4,27 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
+import org.testng.ITestContext;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
+import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
-
 import java.time.Duration;
 import java.util.List;
-
+//@Listeners(lu.distri2b.CustomTestListener.class)
 public class Firsttestng {
     public String baseUrl = "https://bo.distri2b.lu/";
     public WebDriver driver;
 
     @BeforeTest
-    public void launchBrowser() {
+    public void launchBrowser(ITestContext context) {
         // Configuration de WebDriverManager pour gérer ChromeDriver
         driver = new ChromeDriver();
         driver.manage().timeouts().implicitlyWait(Duration.ofMillis(500));
         driver.manage().window().maximize();
-        driver.get(baseUrl);
 
+        context.setAttribute("WebDriver", driver);
+        driver.get(baseUrl);
         // Localisation des éléments de connexion
         try {
             WebElement username = driver.findElement(By.name("username"));
@@ -129,6 +131,16 @@ public class Firsttestng {
             WebElement agentsLink = driver.findElement(By.xpath("//a[@href='/fr/agents']"));
             agentsLink.click();
             WebElement agentsLinkEdit = driver.findElement(By.xpath("//a[@href='/fr/agent/860/edit']"));
+
+            JavascriptExecutor js = (JavascriptExecutor) driver;
+            Long pageHeight = (Long) js.executeScript("return document.body.scrollHeight");
+            // Obtenez la position de l'élément dans la fenêtre
+            int elementPosition = agentsLinkEdit.getLocation().getY();
+
+            // Défilez vers la position de l'élément, mais ajustez légèrement la position
+            js.executeScript("window.scrollBy(0, arguments[0] - 100);", elementPosition);
+
+            Thread.sleep(2000);
             agentsLinkEdit.click();
 
             // Modifier les champs du formulaire
@@ -158,9 +170,7 @@ public class Firsttestng {
             langDropdown.selectByValue("1");
 
             // Défilement jusqu'au milieu de la page pour cliquer sur le bouton
-            JavascriptExecutor js = (JavascriptExecutor) driver;
-            Long pageHeight = (Long) js.executeScript("return document.body.scrollHeight");
-            Long middlePosition = pageHeight / 2 + 20;
+            Long middlePosition = ((pageHeight / 2 )+ 20);
             js.executeScript("window.scrollTo(0, arguments[0]);", middlePosition);
 
             // Attente de 2 secondes avant de cliquer
