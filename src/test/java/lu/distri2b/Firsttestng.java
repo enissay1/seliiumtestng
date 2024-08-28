@@ -11,7 +11,7 @@ import org.testng.annotations.Listeners;
 import org.testng.annotations.Test;
 import java.time.Duration;
 import java.util.List;
-//@Listeners(lu.distri2b.CustomTestListener.class)
+@Listeners(lu.distri2b.CustomTestListener.class)
 public class Firsttestng {
     public String baseUrl = "https://bo.distri2b.lu/";
     public WebDriver driver;
@@ -159,11 +159,16 @@ public class Firsttestng {
                         WebElement agentsLinkEdit = driver.findElement(By.xpath("//a[@href='/fr/agent/860/edit']"));
                         JavascriptExecutor js = (JavascriptExecutor) driver;
                         // Obtenez la position de l'élément dans la fenêtre
-                        int elementPosition = agentsLinkEdit.getLocation().getY();
+                        int elementPositionEdit = agentsLinkEdit.getLocation().getY();
 
                         // Défilez vers la position de l'élément, mais ajustez légèrement la position
-                        js.executeScript("window.scrollBy(0, arguments[0] - 100);", elementPosition);
-
+                        js.executeScript("window.scrollBy(0, arguments[0] - 100);", elementPositionEdit);
+                        try {
+                            Thread.sleep(2000);
+                        } catch (InterruptedException e) {
+                            Thread.currentThread().interrupt(); // Restaurer l'état d'interruption
+                            System.out.println("Le thread a été interrompu.");
+                        }
                         agentsLinkEdit.click();
                         // /fr/agent/860/change-password
                         WebElement agentsLinkEditPassword = driver.findElement(By.xpath("//a[@href='/fr/agent/860/change-password']"));
@@ -187,12 +192,12 @@ public class Firsttestng {
                     js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
                     // Attente de 2 secondes avant de cliquer
                     try {
-                        Thread.sleep(3000);  // Mettre en pause pour s'assurer que l'élément est visible
+                        Thread.sleep(2000);
+                        nextPageLink.click(); // Mettre en pause pour s'assurer que l'élément est visible
                     } catch (InterruptedException e) {
                         Thread.currentThread().interrupt(); // Restaurer l'état d'interruption
                         System.out.println("Le thread a été interrompu.");
                     }
-                    nextPageLink.click();
                     // Attendez que la page suivante se charge
                     Thread.sleep(2000);
                 } catch (NoSuchElementException e) {
@@ -211,6 +216,7 @@ public class Firsttestng {
 
     @Test
     public void modifierAgent() {
+
         try {
             // Naviguer vers la page des agents
             WebElement agentsLink = driver.findElement(By.xpath("//a[@href='/fr/agents']"));
@@ -281,4 +287,6 @@ public class Firsttestng {
     public void terminateBrowser() {
         driver.quit();// Fermer le navigateur à la fin du test
     }
+
+
 }
