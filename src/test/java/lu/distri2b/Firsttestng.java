@@ -83,12 +83,17 @@ public class Firsttestng {
 
             // Défilement jusqu'à la fin de la page pour cliquer sur le bouton
             JavascriptExecutor js = (JavascriptExecutor) driver;
-            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
 
+            js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
             // Cliquer sur le bouton d'ajout d'agent
             WebElement btnAddAgent = driver.findElement(By.cssSelector("#addAgent"));
+            try {
+                Thread.sleep(2000);  // Mettre en pause pour s'assurer que l'élément est visible
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt(); // Restaurer l'état d'interruption
+                System.out.println("Le thread a été interrompu.");
+            }
             btnAddAgent.click();
-
             // Vérification du message de succès
             WebElement messageAddAgent = driver.findElement(By.xpath("//*[contains(text(), 'Agent ajouté avec succès')]"));
             Assert.assertNotNull(messageAddAgent, "Création échouée, message 'success' non trouvé");
@@ -99,7 +104,7 @@ public class Firsttestng {
         }
     }
 
-    @Test
+    @Test (priority = 1)
     public void filtreAgent() {
         try {
             // Naviguer vers la page des agents
@@ -125,6 +130,86 @@ public class Firsttestng {
     }
 
     @Test
+    public void paginateAgent() {
+        // Naviguer vers la page des agents
+        WebElement agentsLink = driver.findElement(By.xpath("//a[@href='/fr/agents']"));
+        agentsLink.click();
+
+        boolean usernameTrouve = false;
+        String usernameRechercher="user1";
+
+        while (!usernameTrouve) {
+            // Récupérer toutes les lignes de la table contenant les usernames
+            List<WebElement> lignesTable = driver.findElements(By.xpath("//table//tr"));
+            for (WebElement ligne : lignesTable) {
+                // Rechercher toutes les cellules (td) de la ligne actuelle
+                List<WebElement> cellules = ligne.findElements(By.tagName("td"));
+
+                // Vérifier si la ligne contient des cellules
+                if (cellules.size() >= 2) {
+                    //WebElement colonneUsername = ligne.findElement(By.xpath(".//td[2]")); //renvoie le deuxieme curent td
+                    //String username1= colonneUsername.getText();
+                    //System.out.println("colone username : "+ username1);
+
+                    // Extraire le texte de la deuxième cellule (colonne username)
+                    String user1 = cellules.get(1).getText(); // Les indices commencent à 0, donc 1 correspond à la deuxième cellule
+                    //System.out.println(user1);
+                    // Vérifiez si le username correspond à celui recherché
+                    if (user1.equals(usernameRechercher)) {
+                        WebElement agentsLinkEdit = driver.findElement(By.xpath("//a[@href='/fr/agent/860/edit']"));
+                        JavascriptExecutor js = (JavascriptExecutor) driver;
+                        // Obtenez la position de l'élément dans la fenêtre
+                        int elementPosition = agentsLinkEdit.getLocation().getY();
+
+                        // Défilez vers la position de l'élément, mais ajustez légèrement la position
+                        js.executeScript("window.scrollBy(0, arguments[0] - 100);", elementPosition);
+
+                        agentsLinkEdit.click();
+                        // /fr/agent/860/change-password
+                        WebElement agentsLinkEditPassword = driver.findElement(By.xpath("//a[@href='/fr/agent/860/change-password']"));
+                        agentsLinkEditPassword.click();
+                        System.out.println("Username '" + usernameRechercher + "' trouvé !");
+                        usernameTrouve = true;
+                        break;
+                    }
+                } else {
+                    // Ignorer les lignes qui n'ont pas assez de cellules
+                    System.out.println("Ligne sans colonnes suffisantes, ignorée.");
+                }
+            }
+
+            // Si le username n'a pas été trouvé, passer à la page suivante
+            if (!usernameTrouve) {
+                try {
+                    WebElement nextPageLink = driver.findElement(By.xpath("//*[@id=\"layout-wrapper\"]/div[2]/div/div/div[3]/div[1]/div/div/div[2]/div[2]/nav/ul/li[9]/a"));
+                    // Défilement jusqu'à la fin de la page pour cliquer sur le bouton
+                    JavascriptExecutor js = (JavascriptExecutor) driver;
+                    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
+                    // Attente de 2 secondes avant de cliquer
+                    try {
+                        Thread.sleep(3000);  // Mettre en pause pour s'assurer que l'élément est visible
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt(); // Restaurer l'état d'interruption
+                        System.out.println("Le thread a été interrompu.");
+                    }
+                    nextPageLink.click();
+                    // Attendez que la page suivante se charge
+                    Thread.sleep(2000);
+                } catch (NoSuchElementException e) {
+                    System.out.println("Fin de la pagination. Le username n'a pas été trouvé.");
+                    break;
+                } catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                }
+            }
+        }
+
+        if (!usernameTrouve) {
+            System.out.println("Le username '" + usernameRechercher + "' n'a pas été trouvé dans toutes les pages.");
+        }
+    }
+
+    @Test
     public void modifierAgent() {
         try {
             // Naviguer vers la page des agents
@@ -136,7 +221,6 @@ public class Firsttestng {
             Long pageHeight = (Long) js.executeScript("return document.body.scrollHeight");
             // Obtenez la position de l'élément dans la fenêtre
             int elementPosition = agentsLinkEdit.getLocation().getY();
-
             // Défilez vers la position de l'élément, mais ajustez légèrement la position
             js.executeScript("window.scrollBy(0, arguments[0] - 100);", elementPosition);
 
@@ -192,68 +276,7 @@ public class Firsttestng {
             Thread.currentThread().interrupt(); // Réinterrompre le thread si l'attente est interrompue
         }
     }
-    @Test
-    public void paginateAgent() {
-        // Naviguer vers la page des agents
-        WebElement agentsLink = driver.findElement(By.xpath("//a[@href='/fr/agents']"));
-        agentsLink.click();
 
-        boolean usernameTrouve = false;
-        String usernameRechercher="user1";
-
-        while (!usernameTrouve) {
-            // Récupérer toutes les lignes de la table contenant les usernames
-            List<WebElement> lignesTable = driver.findElements(By.xpath("//table//tr"));
-            for (WebElement ligne : lignesTable) {
-                // Rechercher toutes les cellules (td) de la ligne actuelle
-                List<WebElement> cellules = ligne.findElements(By.tagName("td"));
-
-                // Vérifier si la ligne contient des cellules
-                if (cellules.size() >= 2) {
-                    //WebElement colonneUsername = ligne.findElement(By.xpath(".//td[2]")); //renvoie le deuxieme curent td
-                    //String username1= colonneUsername.getText();
-                    //System.out.println("colone username : "+ username1);
-
-                    // Extraire le texte de la deuxième cellule (colonne username)
-                    String user1 = cellules.get(1).getText(); // Les indices commencent à 0, donc 1 correspond à la deuxième cellule
-                    //System.out.println(user1);
-                    // Vérifiez si le username correspond à celui recherché
-                    if (user1.equals(usernameRechercher)) {
-                        System.out.println("Username '" + usernameRechercher + "' trouvé !");
-                        usernameTrouve = true;
-                        break;
-                    }
-                } else {
-                    // Ignorer les lignes qui n'ont pas assez de cellules
-                    System.out.println("Ligne sans colonnes suffisantes, ignorée.");
-                }
-            }
-
-            // Si le username n'a pas été trouvé, passer à la page suivante
-            if (!usernameTrouve) {
-                try {
-                    WebElement nextPageLink = driver.findElement(By.xpath("//*[@id=\"layout-wrapper\"]/div[2]/div/div/div[3]/div[1]/div/div/div[2]/div[2]/nav/ul/li[9]/a"));
-                    // Défilement jusqu'à la fin de la page pour cliquer sur le bouton
-                    JavascriptExecutor js = (JavascriptExecutor) driver;
-                    js.executeScript("window.scrollTo(0, document.body.scrollHeight);");
-                    // Attente de 2 secondes avant de cliquer
-                    Thread.sleep(2000);
-                    nextPageLink.click();
-                    // Attendez que la page suivante se charge
-                    Thread.sleep(2000);
-                } catch (NoSuchElementException e) {
-                    System.out.println("Fin de la pagination. Le username n'a pas été trouvé.");
-                    break;
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                }
-            }
-        }
-
-        if (!usernameTrouve) {
-            System.out.println("Le username '" + usernameRechercher + "' n'a pas été trouvé dans toutes les pages.");
-        }
-    }
     @AfterTest
     public void terminateBrowser() {
         driver.quit();// Fermer le navigateur à la fin du test

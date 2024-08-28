@@ -7,7 +7,6 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.apache.commons.io.FileUtils;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -38,12 +37,16 @@ public class CustomTestListener implements ITestListener {
     }
     @Override
     public void onTestSuccess(ITestResult result) {
+        long duration = result.getEndMillis() - result.getStartMillis();
+        long durationInSeconds = duration / 1000;
 
+        ///System.out.println("Test passed: " + result.getMethod().getMethodName() + " | Duration: " + duration + " ms");
         // Ajouter un message de succès pour chaque test réussi
         try {
             writer.write("<div style='color:green;'>");
             writer.write("<h2>Test Passed: " + result.getName() + "</h2>");
             writer.write("<p>Details: Test method " + result.getMethod().getMethodName() + " passed successfully.</p>");
+            writer.write("<p> Le temps du test est de :" + durationInSeconds +" seconds</p>");
             writer.write("</div>");
         } catch (IOException e) {
             e.printStackTrace();
@@ -56,18 +59,15 @@ public class CustomTestListener implements ITestListener {
         if(driver == null){
             System.out.println("mon driver est " + driver);
         }
-
         try {
                 // Ajout du message d'échec au rapport HTML
                 writer.write("<div style='color:red;'>");
                 writer.write("<h2>Test Failed: " + result.getName() + "</h2>");
                 writer.write("<p>Details: Test method " + result.getMethod().getMethodName() + " failed with exception: " + result.getThrowable() + "</p>");
-
                 // Capture d'écran lors de l'échec du test
                 File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
                 String screenshotPath = "C:/Users/Yassine/IdeaProjects/seliiumtestng/errorScreenshots/" + result.getName() + "-" + Arrays.toString(result.getParameters()) + ".jpg";
                 FileUtils.copyFile(scrFile, new File(screenshotPath));
-
                 // Intégrer l'image dans le rapport HTML
                 writer.write("<p><img src='" + screenshotPath + "' alt='Screenshot' style='width:600px;'/></p>");
                 writer.write("</div>");
