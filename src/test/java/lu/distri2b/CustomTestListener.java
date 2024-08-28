@@ -22,6 +22,9 @@ public class CustomTestListener implements ITestListener {
     private BufferedWriter writer;
     private final File reportFile = new File("test-report.html");
 
+    private final String failed = "Test Failed: ";
+    private final String passed = "Test passed: ";
+
     @Override
     public void onStart(ITestContext context) {
         totalTests = context.getAllTestMethods().length;
@@ -41,13 +44,13 @@ public class CustomTestListener implements ITestListener {
 
     @Override
     public void onTestSuccess(ITestResult result) {
-        writeTestResult(result, "green", "Test Passed: ");
+        writeTestResult(result, "green", passed);
     }
 
     @Override
     public void onTestFailure(ITestResult result) {
         WebDriver driver = (WebDriver) result.getTestContext().getAttribute("WebDriver");
-        writeTestResult(result, "red", "Test Failed: ");
+        writeTestResult(result, "red", failed);
         if (driver != null) {
             takeScreenshot(driver, result);
         }
@@ -95,7 +98,7 @@ public class CustomTestListener implements ITestListener {
             writer.write("<h2>" + messagePrefix + result.getName() + "</h2>");
             writer.write("<p>Description: " + description + "</p>");
             writer.write("<p>Details: Test method " + result.getMethod().getMethodName() + " completed in " + durationInSeconds + " seconds.</p>\n");
-            if(messagePrefix.startsWith("Test Failed: ")){
+            if(messagePrefix.startsWith(failed)){
                 writer.write("<p>"+ result.getMethod().getMethodName() + " failed with exception: " + result.getThrowable() + "</p>");
             };
             writer.write("</div>");

@@ -53,6 +53,8 @@ public class MailtrapEmailExample {
                 "    </table>" +
                       msg + msgSuccess
                 +
+                "<p style=\"font-family: Arial, sans-serif;color:blue;\">Veuillez trouver en pièce jointe le rapport de test.</p>\n"
+                +
                 "    <h2>Vue d'ensemble</h2>\n" +
                 "    <p>\n" +
                 "        Le scénario de test automatisé pour l'application web <a href=\"https://bo.distri2b.lu\">https://bo.distri2b.lu</a>, couvrant les principales fonctionnalités de gestion des agents. Les tests ont été conçus pour vérifier la connexion, l'ajout, le filtrage, la pagination et la modification des agents. Les résultats indiquent si chaque fonctionnalité est opérationnelle et conforme aux attentes.\n" +
