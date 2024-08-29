@@ -7,11 +7,14 @@ import org.testng.ITestContext;
 import org.testng.ITestListener;
 import org.testng.ITestResult;
 import org.apache.commons.io.FileUtils;
+import org.testng.Reporter;
+
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.List;
 
 public class CustomTestListener implements ITestListener {
     public static int totalTests;
@@ -101,6 +104,16 @@ public class CustomTestListener implements ITestListener {
             if(messagePrefix.startsWith(failed)){
                 writer.write("<p>"+ result.getMethod().getMethodName() + " failed with exception: " + result.getThrowable() + "</p>");
             };
+            // Récupérer les messages de log de TestNG
+            List<String> reporterMessages = Reporter.getOutput(result);
+            if (!reporterMessages.isEmpty()) {
+                writer.write("<p><strong>Log messages:</strong></p>");
+                writer.write("<ul>");
+                for (String message : reporterMessages) {
+                    writer.write("<li>" + message + "</li>");
+                }
+                writer.write("</ul>");
+            }
             writer.write("</div>");
         } catch (IOException e) {
             e.printStackTrace();

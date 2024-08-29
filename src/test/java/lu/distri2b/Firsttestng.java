@@ -5,6 +5,7 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.Select;
 import org.testng.Assert;
 import org.testng.ITestContext;
+import org.testng.Reporter;
 import org.testng.annotations.AfterTest;
 import org.testng.annotations.BeforeTest;
 import org.testng.annotations.Listeners;
@@ -52,7 +53,6 @@ public class Firsttestng {
             // Naviguer vers la page des agents
             WebElement agentsLink = driver.findElement(By.xpath("//a[@href='/fr/agents']"));
             agentsLink.click();
-
             // Naviguer vers le formulaire d'ajout d'agent
             WebElement newAgentLink = driver.findElement(By.xpath("//a[@href='/fr/agent/new']"));
             newAgentLink.click();
@@ -100,6 +100,7 @@ public class Firsttestng {
 
         } catch (NoSuchElementException e) {
             System.out.println("Erreur lors de l'ajout d'agent : Élément non trouvé.");
+            Reporter.log("agent not created");
             Assert.fail("Création échouée");
         }
     }
